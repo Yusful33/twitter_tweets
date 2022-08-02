@@ -1,36 +1,38 @@
-from twitter_setup import TwitterClient
+from twitter_setup import TwitterClient, create_subdict_from_dict
+from gather_tweets_utils import date_cleanup, create_subdict_from_dict, NAME
 from datetime import datetime, timedelta, date 
+import logging 
+logging.basicConfig(level=logging.INFO)
 
 
-_NAME = "APompliano"
 # _SEARCH_TERM = "best article you read this week -filter:retweets AND -filter:replies -from: APompliano"
 _SEARCH_TERM = "best article you read this week from: APompliano"
-
+_ORG_TWEET_FIELDS = ['id', 'created_at', 'text', 'user.name', 'user.screen_name']
 _TO = "to:"
 _LINK = " has:links"
-
-def date_cleanup(date):
-    """Converting datetime to string to be feed into 30_day search param."""
-    from_date = datetime.strftime(date, '%Y%m%d')
-    to_date = str(int(from_date) + 1) + '0000'
-    from_date+= '0000'
-    return from_date, to_date
+_YAML_FILE = "auth.yaml"
 
 
+client = TwitterClient(_YAML_FILE, NAME)
 
-client = TwitterClient("auth.yaml", _NAME)
+# Using next as this is an item iterator
+orig_tweet = next(client.search_tweets(_SEARCH_TERM))
 
-tweets = client.search_tweets(_SEARCH_TERM)
-result_dict = dict()
-for tweet in tweets:
-    # Added b/c the _SEARCH_TERM will include instances where users tag him in an original tweet
-    if tweet.user.screen_name == 'APompliano':
-        print(tweet.created_at, tweet.id, tweet.text, 
-                tweet.user.screen_name, tweet.user.name)
-        from_date, to_date = date_cleanup(tweet.created_at)
-        responses = client.get_tweet_responses(_TO+_NAME+_LINK, 
-                            tweet.id, 
-                            from_date,
-                            to_date
-                            )
-        print(responses)
+# This is where I would call the get_latest_tweet_dict if necessary
+
+# If we find a tweet, go looking for replies
+if orig_tweet:
+    orig_record = create_subdict_from_dict(orig_tweet._json, _ORG_TWEET_FIELDS)
+    logging.info(orig_record)
+    from_date, to_date = date_cleanup(orig_tweet.created_at)
+    search_response_query = _TO+NAME+_LINK
+    # Need to determine the amount of replies to check for??
+    # How can I isolate the orig_record.id??
+    num_replies = client.number_of_replies(search_response_query, orig_record.id)
+    print(num_replies)
+    # replies = client.get_tweet_responses(search_response_query, 
+    #                     orig_record.id, 
+    #                     from_date,
+    #                     to_date
+    #                     )
+    # logging.info(replies)

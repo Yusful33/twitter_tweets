@@ -1,54 +1,58 @@
 import yaml
 import logging
 import tweepy as tw
+from gather_tweets_utils import read_yaml, twt_auth, create_subdict_from_dict, NAME
 
-_CONSUMER_SECRET = 'consumer_secret'
-_CONSUMER_KEY = 'consumer_key'
-_ACCESS_TOKEN_SECRET = 'access_token_secret'
-_ACCESS_TOKEN = 'access_token'
 _IMPORTANT_FIELDS = ['id', 'created_at', 'in_reply_to_status_id', 'text', 'retweet_count', 'favorite_count'] 
-
-def read_yaml(yaml_file):
-    """Read Yaml file."""
-    with open(yaml_file, "r") as creds:
-        try:
-            twitter_auth = yaml.safe_load(creds)
-            return twitter_auth
-        except yaml.YAMLError as exc:
-            logging.info(exc)
-def twt_auth(yaml_file):
-    """Authenticating to Twitter."""
-    key_dict = read_yaml(yaml_file)
-    auth = tw.OAuthHandler(key_dict[_CONSUMER_KEY], key_dict[_CONSUMER_SECRET])
-    auth.set_access_token(key_dict[_ACCESS_TOKEN], key_dict[_ACCESS_TOKEN_SECRET])
-    return auth
 
 class TwitterClient():
     def __init__(self, yaml_file, twitter_user=None):
-        self.auth = twt_auth(yaml_file)
-        self.twitter_client = tw.API(self.auth, wait_on_rate_limit=True)
-        self.twitter_user = twitter_user 
+        self._auth = twt_auth(yaml_file)
+        self._twitter_client = tw.API(self._auth, wait_on_rate_limit=True)
+        self._twitter_user = twitter_user 
 
     def user_name(self):
-        user = self.twitter_client.get_user(screen_name=self.twitter_user)
+        """Gives you the screen name of a user."""
+        user = self._twitter_client.get_user(screen_name=self._twitter_user)
         print(type(user))
         return user.screen_name
 
     def search_tweets(self, search_term):
-        tweets = tw.Cursor(self.twitter_client.search_30_day,
+        """Gets most recent tweet asking for articles."""
+        tweets = tw.Cursor(self._twitter_client.search_30_day,
                     label='dev',
                    query=search_term,
                     ).items(1)
         return tweets
+
+    def most_recent_tweet(self, tweets):
+        """Most recent tweet by a user."""
+        latest = max(tweets['id'], key=lambda ev: ev['id'])
+        return latest
+    
+    def number_of_replies(self, filter_param, tweet_id):
+        """Determine the number of responses a given tweet recieved."""
+        replies = 0
+        all_replies = tw.Cursor(self._twitter_client.search_30_day(
+                            label='dev',
+                            query=filter_param
+                            , 
+                            since_id = tweet_id
+                            )).items()
+        for item in all_replies:
+            if item.in_reply_to_status_id == tweet_id:
+                replies += 1
+        return replies
     
     def get_tweet_responses(self, filter_param, tweet_id, from_date, to_date):
+        """Responses to a particular tweet within a given date range."""
         replies=[]
-        for tweet in tw.Cursor(self.twitter_client.search_30_day, 
+        for tweet in tw.Cursor(self._twitter_client.search_30_day, 
                                 label='dev', 
                                 query=filter_param, 
-                                fromDate=from_date, toDate=to_date).items(50):
+                                fromDate=from_date, toDate=to_date).items(10):
             if hasattr(tweet, 'in_reply_to_status_id_str'):
                 if tweet.in_reply_to_status_id == tweet_id:
-                    field_dict = dict((k, tweet._json[k]) for k in _IMPORTANT_FIELDS if k in tweet._json)
+                    field_dict = create_subdict_from_dict(tweet._json, _IMPORTANT_FIELDS)
                     replies.append(field_dict)
         return replies
