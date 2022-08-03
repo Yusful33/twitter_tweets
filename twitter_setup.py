@@ -21,8 +21,7 @@ class TwitterClient():
         """Gets most recent tweet asking for articles."""
         tweets = tw.Cursor(self._twitter_client.search_30_day,
                     label='dev',
-                   query=search_term,
-                    ).items(1)
+                   query=search_term).items(1)
         return tweets
 
     def most_recent_tweet(self, tweets):
@@ -30,27 +29,15 @@ class TwitterClient():
         latest = max(tweets['id'], key=lambda ev: ev['id'])
         return latest
     
-    def number_of_replies(self, filter_param, tweet_id):
-        """Determine the number of responses a given tweet recieved."""
-        replies = 0
-        all_replies = tw.Cursor(self._twitter_client.search_30_day(
-                            label='dev',
-                            query=filter_param
-                            , 
-                            since_id = tweet_id
-                            )).items()
-        for item in all_replies:
-            if item.in_reply_to_status_id == tweet_id:
-                replies += 1
-        return replies
-    
     def get_tweet_responses(self, filter_param, tweet_id, from_date, to_date):
         """Responses to a particular tweet within a given date range."""
         replies=[]
         for tweet in tw.Cursor(self._twitter_client.search_30_day, 
                                 label='dev', 
                                 query=filter_param, 
-                                fromDate=from_date, toDate=to_date).items(10):
+                                fromDate=from_date, toDate=to_date,
+                                maxResults = 10
+                                ).items():
             if hasattr(tweet, 'in_reply_to_status_id_str'):
                 if tweet.in_reply_to_status_id == tweet_id:
                     field_dict = create_subdict_from_dict(tweet._json, _IMPORTANT_FIELDS)
