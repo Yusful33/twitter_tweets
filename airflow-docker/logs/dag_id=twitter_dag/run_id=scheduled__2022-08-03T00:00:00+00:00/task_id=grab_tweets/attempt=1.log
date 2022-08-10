@@ -1,0 +1,105 @@
+[2022-08-09 19:35:36,727] {taskinstance.py:1179} INFO - Dependencies all met for <TaskInstance: twitter_dag.grab_tweets scheduled__2022-08-03T00:00:00+00:00 [queued]>
+[2022-08-09 19:35:36,744] {taskinstance.py:1179} INFO - Dependencies all met for <TaskInstance: twitter_dag.grab_tweets scheduled__2022-08-03T00:00:00+00:00 [queued]>
+[2022-08-09 19:35:36,745] {taskinstance.py:1376} INFO - 
+--------------------------------------------------------------------------------
+[2022-08-09 19:35:36,746] {taskinstance.py:1377} INFO - Starting attempt 1 of 2
+[2022-08-09 19:35:36,747] {taskinstance.py:1378} INFO - 
+--------------------------------------------------------------------------------
+[2022-08-09 19:35:36,771] {taskinstance.py:1397} INFO - Executing <Task(BashOperator): grab_tweets> on 2022-08-03 00:00:00+00:00
+[2022-08-09 19:35:36,782] {standard_task_runner.py:52} INFO - Started process 156 to run task
+[2022-08-09 19:35:36,801] {standard_task_runner.py:79} INFO - Running: ['***', 'tasks', 'run', 'twitter_dag', 'grab_tweets', 'scheduled__2022-08-03T00:00:00+00:00', '--job-id', '6', '--raw', '--subdir', 'DAGS_FOLDER/twitter_***.py', '--cfg-path', '/tmp/tmpq126z5cw', '--error-file', '/tmp/tmpjih4y4yg']
+[2022-08-09 19:35:36,805] {standard_task_runner.py:80} INFO - Job 6: Subtask grab_tweets
+[2022-08-09 19:35:36,965] {task_command.py:371} INFO - Running <TaskInstance: twitter_dag.grab_tweets scheduled__2022-08-03T00:00:00+00:00 [running]> on host 9389ea9491e2
+[2022-08-09 19:35:37,103] {taskinstance.py:1591} INFO - Exporting the following env vars:
+AIRFLOW_CTX_DAG_EMAIL=ycattaneo33@gmail.com
+AIRFLOW_CTX_DAG_OWNER=***
+AIRFLOW_CTX_DAG_ID=twitter_dag
+AIRFLOW_CTX_TASK_ID=grab_tweets
+AIRFLOW_CTX_EXECUTION_DATE=2022-08-03T00:00:00+00:00
+AIRFLOW_CTX_TRY_NUMBER=1
+AIRFLOW_CTX_DAG_RUN_ID=scheduled__2022-08-03T00:00:00+00:00
+[2022-08-09 19:35:37,106] {subprocess.py:62} INFO - Tmp dir root location: 
+ /tmp
+[2022-08-09 19:35:37,108] {subprocess.py:74} INFO - Running command: ['bash', '-c', 'python ../grab_tweets.py']
+[2022-08-09 19:35:37,178] {subprocess.py:85} INFO - Output:
+[2022-08-09 19:35:37,458] {subprocess.py:92} INFO - python: can't open file '../grab_tweets.py': [Errno 2] No such file or directory
+[2022-08-09 19:35:37,463] {subprocess.py:96} INFO - Command exited with return code 2
+[2022-08-09 19:35:37,500] {taskinstance.py:1909} ERROR - Task failed with exception
+Traceback (most recent call last):
+  File "/home/airflow/.local/lib/python3.7/site-packages/airflow/operators/bash.py", line 195, in execute
+    f'Bash command failed. The command returned a non-zero exit code {result.exit_code}.'
+airflow.exceptions.AirflowException: Bash command failed. The command returned a non-zero exit code 2.
+[2022-08-09 19:35:37,516] {taskinstance.py:1420} INFO - Marking task as UP_FOR_RETRY. dag_id=twitter_dag, task_id=grab_tweets, execution_date=20220803T000000, start_date=20220809T193536, end_date=20220809T193537
+[2022-08-09 19:35:37,545] {warnings.py:110} WARNING - /home/***/.local/lib/python3.7/site-packages/***/utils/email.py:119: PendingDeprecationWarning: Fetching SMTP credentials from configuration variables will be deprecated in a future release. Please set credentials using a connection instead.
+  send_mime_email(e_from=mail_from, e_to=recipients, mime_msg=msg, conn_id=conn_id, dryrun=dryrun)
+
+[2022-08-09 19:35:37,547] {configuration.py:552} WARNING - section/key [smtp/smtp_user] not found in config
+[2022-08-09 19:35:37,549] {email.py:228} INFO - Email alerting: attempt 1
+[2022-08-09 19:35:37,574] {configuration.py:552} WARNING - section/key [smtp/smtp_user] not found in config
+[2022-08-09 19:35:37,576] {email.py:228} INFO - Email alerting: attempt 1
+[2022-08-09 19:35:37,578] {taskinstance.py:1964} ERROR - Failed to send email to: ['ycattaneo33@gmail.com']
+Traceback (most recent call last):
+  File "/home/airflow/.local/lib/python3.7/site-packages/airflow/models/taskinstance.py", line 1471, in _run_raw_task
+    self._execute_task_with_callbacks(context, test_mode)
+  File "/home/airflow/.local/lib/python3.7/site-packages/airflow/models/taskinstance.py", line 1618, in _execute_task_with_callbacks
+    result = self._execute_task(context, task_orig)
+  File "/home/airflow/.local/lib/python3.7/site-packages/airflow/models/taskinstance.py", line 1679, in _execute_task
+    result = execute_callable(context=context)
+  File "/home/airflow/.local/lib/python3.7/site-packages/airflow/operators/bash.py", line 195, in execute
+    f'Bash command failed. The command returned a non-zero exit code {result.exit_code}.'
+airflow.exceptions.AirflowException: Bash command failed. The command returned a non-zero exit code 2.
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/home/airflow/.local/lib/python3.7/site-packages/airflow/models/taskinstance.py", line 2346, in email_alert
+    send_email(task.email, subject, html_content)
+  File "/home/airflow/.local/lib/python3.7/site-packages/airflow/utils/email.py", line 71, in send_email
+    **kwargs,
+  File "/home/airflow/.local/lib/python3.7/site-packages/airflow/utils/email.py", line 119, in send_email_smtp
+    send_mime_email(e_from=mail_from, e_to=recipients, mime_msg=msg, conn_id=conn_id, dryrun=dryrun)
+  File "/home/airflow/.local/lib/python3.7/site-packages/airflow/utils/email.py", line 230, in send_mime_email
+    smtp_conn = _get_smtp_connection(smtp_host, smtp_port, smtp_timeout, smtp_ssl)
+  File "/home/airflow/.local/lib/python3.7/site-packages/airflow/utils/email.py", line 264, in _get_smtp_connection
+    else smtplib.SMTP(host=host, port=port, timeout=timeout)
+  File "/usr/local/lib/python3.7/smtplib.py", line 251, in __init__
+    (code, msg) = self.connect(host, port)
+  File "/usr/local/lib/python3.7/smtplib.py", line 336, in connect
+    self.sock = self._get_socket(host, port, self.timeout)
+  File "/usr/local/lib/python3.7/smtplib.py", line 307, in _get_socket
+    self.source_address)
+  File "/usr/local/lib/python3.7/socket.py", line 728, in create_connection
+    raise err
+  File "/usr/local/lib/python3.7/socket.py", line 716, in create_connection
+    sock.connect(sa)
+OSError: [Errno 99] Cannot assign requested address
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/home/airflow/.local/lib/python3.7/site-packages/airflow/models/taskinstance.py", line 1962, in handle_failure
+    self.email_alert(error, task)
+  File "/home/airflow/.local/lib/python3.7/site-packages/airflow/models/taskinstance.py", line 2348, in email_alert
+    send_email(task.email, subject, html_content_err)
+  File "/home/airflow/.local/lib/python3.7/site-packages/airflow/utils/email.py", line 71, in send_email
+    **kwargs,
+  File "/home/airflow/.local/lib/python3.7/site-packages/airflow/utils/email.py", line 119, in send_email_smtp
+    send_mime_email(e_from=mail_from, e_to=recipients, mime_msg=msg, conn_id=conn_id, dryrun=dryrun)
+  File "/home/airflow/.local/lib/python3.7/site-packages/airflow/utils/email.py", line 230, in send_mime_email
+    smtp_conn = _get_smtp_connection(smtp_host, smtp_port, smtp_timeout, smtp_ssl)
+  File "/home/airflow/.local/lib/python3.7/site-packages/airflow/utils/email.py", line 264, in _get_smtp_connection
+    else smtplib.SMTP(host=host, port=port, timeout=timeout)
+  File "/usr/local/lib/python3.7/smtplib.py", line 251, in __init__
+    (code, msg) = self.connect(host, port)
+  File "/usr/local/lib/python3.7/smtplib.py", line 336, in connect
+    self.sock = self._get_socket(host, port, self.timeout)
+  File "/usr/local/lib/python3.7/smtplib.py", line 307, in _get_socket
+    self.source_address)
+  File "/usr/local/lib/python3.7/socket.py", line 728, in create_connection
+    raise err
+  File "/usr/local/lib/python3.7/socket.py", line 716, in create_connection
+    sock.connect(sa)
+OSError: [Errno 99] Cannot assign requested address
+[2022-08-09 19:35:37,611] {standard_task_runner.py:97} ERROR - Failed to execute job 6 for task grab_tweets (Bash command failed. The command returned a non-zero exit code 2.; 156)
+[2022-08-09 19:35:37,657] {local_task_job.py:156} INFO - Task exited with return code 1
+[2022-08-09 19:35:37,723] {local_task_job.py:273} INFO - 0 downstream tasks scheduled from follow-on schedule check
