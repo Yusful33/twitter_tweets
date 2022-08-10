@@ -33,7 +33,7 @@ with DAG(
         # 'trigger_rule': 'all_success'
     },
     description='Sourcing data from Twitter, Loading to MongoDB and then pushing to SMS via Twilio.',
-    schedule_interval=timedelta(days=7),
+    schedule_interval=timedelta(days=1),
     start_date=datetime(2022, 8, 1),
     catchup=True,
     tags=['twitter'],
